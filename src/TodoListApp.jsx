@@ -1,25 +1,37 @@
-import { useState } from 'react';
+import { use } from 'react';
+import { useState, useEffect } from 'react';
 
 const TodoListApp = () => {
 
-    const [tasks, setTasks] = useState(["kdjhashd", "kjdshdkashd", "djsahdk"]);
+    const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => {
+            console.log("alsdhlasd")
+            return setShowError(false)
+        },2500)
+    }, [showError])
 
     const handleInputChange = (e) => {
         setNewTask(e.target.value)
     }
 
     const addTask = () => {
-        if (newTask.trim !== "") {
+        if (newTask.trim() !== "") {
             setTasks(t => [...t, newTask]);
             setNewTask("");
+        } else {
+            setErrorMessage("You can not add empty todo!");
+            setShowError(true);
         }
     }
 
     const deleteTask = (index) => {
 
         const updatedTasks = tasks.filter((_, i) => { return index !== i });
-        console.log(updatedTasks)
         setTasks(updatedTasks);
     }
 
@@ -30,6 +42,9 @@ const TodoListApp = () => {
             [updatedTasks[index], updatedTasks[index + 1]] =
                 [updatedTasks[index + 1], updatedTasks[index]];
             setTasks(updatedTasks);
+        } else {
+            setErrorMessage("This task is alredy at the bottom");
+            setShowError(true);
         }
     }
 
@@ -40,6 +55,9 @@ const TodoListApp = () => {
             [updatedTasks[index], updatedTasks[index - 1]] =
                 [updatedTasks[index - 1], updatedTasks[index]];
             setTasks(updatedTasks);
+        } else {
+            setErrorMessage("This task is alredy at the top");
+            setShowError(true);
         }
     }
 
@@ -53,11 +71,11 @@ const TodoListApp = () => {
                     value={newTask}
                     onChange={(e) => handleInputChange(e)} />
                 <button className="add-button"
-                    onClick={addTask}>
+                    onClick={() => addTask()}>
                     Add Task
                 </button>
             </div>
-
+            {showError && <div className="error-message">{errorMessage}</div>}
             <ol>
                 {tasks?.map((task, index) => {
                     return <li key={index}>
